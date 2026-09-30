@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Julio | Cybersecurity</title>
+<style>
+  :root {
+    --bg: #0a0e14;
+    --panel: #0f1620;
+    --green: #39ff14;
+    --cyan: #00e5ff;
+    --dim: #5c6773;
+    --text: #c9d1d9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Courier New", monospace;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* scanline overlay */
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0 1px, transparent 1px 3px);
+    pointer-events: none;
+  }
+  canvas { position: fixed; inset: 0; z-index: -1; opacity: 0.12; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 60px 20px; }
+  .terminal {
+    background: var(--panel);
+    border: 1px solid #1f2a36;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(57,255,20,0.15);
+    overflow: hidden;
+  }
+  .bar { background: #161f2b; padding: 10px 14px; display: flex; gap: 8px; align-items: center; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .r { background: #ff5f56; } .y { background: #ffbd2e; } .g { background: #27c93f; }
+  .bar span { color: var(--dim); font-size: 13px; margin-left: 10px; }
+  .body { padding: 30px; }
+  .prompt { color: var(--green); }
+  .path { color: var(--cyan); }
+  h1 {
+    font-size: 2.6rem;
+    color: var(--green);
+    text-shadow: 0 0 10px var(--green);
+    margin: 10px 0;
+  }
+  #typed::after { content: "█"; animation: blink 1s steps(1) infinite; color: var(--green); }
+  @keyframes blink { 50% { opacity: 0; } }
+  .role { color: var(--cyan); font-size: 1.1rem; }
+  section { margin-top: 30px; }
+  h2 { color: var(--cyan); font-size: 1.1rem; margin-bottom: 10px; }
+  h2::before { content: "$ "; color: var(--green); }
+  .skills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .skill {
+    border: 1px solid var(--green);
+    color: var(--green);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+  .skill:hover { background: var(--green); color: var(--bg); box-shadow: 0 0 12px var(--green); }
+  ul { list-style: none; }
+  li::before { content: "> "; color: var(--green); }
+  a { color: var(--cyan); text-decoration: none; border-bottom: 1px dashed var(--cyan); }
+  a:hover { color: var(--green); border-color: var(--green); }
+  footer { text-align: center; color: var(--dim); margin-top: 40px; font-size: 13px; }
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+
+<div class="wrap">
+  <div class="terminal">
+    <div class="bar">
+      <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+      <span>julio@ec2:~</span>
+    </div>
+    <div class="body">
+      <p><span class="prompt">julio@ec2</span>:<span class="path">~</span>$ whoami</p>
+      <h1 id="typed"></h1>
+      <p class="role">CIT Student @ BCIT // Aspiring Cybersecurity Analyst</p>
+
+      <section>
+        <h2>cat about.txt</h2>
+        <p>I'm a Computer Information Technology student at BCIT with a strong interest in cybersecurity.
+           I like understanding how systems work so I can learn how to defend them. Right now I'm
+           building hands-on experience with cloud servers, Linux, and containers. This site is
+           running in Docker on my own AWS EC2 instance.</p>
+      </section>
+
+      <section>
+        <h2>ls skills/</h2>
+        <div class="skills">
+          <span class="skill">Python</span>
+          <span class="skill">JavaScript</span>
+          <span class="skill">TypeScript</span>
+          <span class="skill">SQL / MySQL</span>
+          <span class="skill">Linux CLI</span>
+          <span class="skill">Docker</span>
+          <span class="skill">AWS EC2</span>
+          <span class="skill">SSH</span>
+        </div>
+      </section>
+
+      <section>
+        <h2>cat interests.txt</h2>
+        <ul>
+          <li>Network security &amp; traffic analysis</li>
+          <li>Cloud security &amp; hardening servers</li>
+          <li>Penetration testing &amp; CTF challenges</li>
+          <li>Incident response &amp; threat detection</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>./contact.sh</h2>
+        <ul>
+          <li>GitHub: <a href="https://github.com/LucasJulioSanto" target="_blank">LucasJulioSanto</a></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+  <footer>[ secured by caffeine &amp; curiosity ] &copy; 2026 Julio</footer>
+</div>
+
+<script>
+  // typing effect
+  const text = "Julio Santos";
+  let i = 0;
+  (function type() {
+    if (i < text.length) {
+      document.getElementById("typed").textContent += text[i++];
+      setTimeout(type, 120);
+    }
+  })();
+
+  // matrix rain background
+  const c = document.getElementById("matrix");
+  const ctx = c.getContext("2d");
+  function resize() { c.width = innerWidth; c.height = innerHeight; }
+  resize(); addEventListener("resize", resize);
+  const chars = "01アイウエオカキクケコ<>/{}#$";
+  let drops = Array(Math.floor(innerWidth / 16)).fill(1);
+  setInterval(() => {
+    ctx.fillStyle = "rgba(10,14,20,0.1)";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.fillStyle = "#39ff14";
+    ctx.font = "16px monospace";
+    drops.forEach((y, x) => {
+      ctx.fillText(chars[Math.floor(Math.random() * chars.length)], x * 16, y * 16);
+      if (y * 16 > c.height && Math.random() > 0.975) drops[x] = 0;
+      drops[x]++;
+    });
+  }, 50);
+</script>
+</body>
+</html>
