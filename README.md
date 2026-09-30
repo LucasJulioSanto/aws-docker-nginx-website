@@ -46,8 +46,8 @@ Static website (site/)
 
 Option 1: build an image
 ```bash
-git clone https://github.com/LucasJulioSanto/aws-linux-nginx-project.git
-cd aws-linux-nginx-project
+git clone https://github.com/LucasJulioSanto/aws-docker-nginx-website.git
+cd aws-docker-nginx-website
 docker build -t my-site .
 docker run -d --name my-site -p 80:80 my-site
 ```
